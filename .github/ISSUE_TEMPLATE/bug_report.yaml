@@ -1,0 +1,76 @@
+name: "バグ報告"
+description: "バグが発生した場合にこのフォームを使用してください。"
+title: "[バグ] 簡潔なバグの説明"
+labels:
+  - bug
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **バグの説明を以下に入力してください。**
+        バグの詳細な説明や発生した状況をわかりやすく書いてください。
+
+  - type: input
+    id: bug_description
+    attributes:
+      label: "バグの説明"
+      description: "バグの発生状況、予想される結果と実際の結果を説明してください。"
+      placeholder: "例: 特定のボタンをクリックするとアプリがクラッシュします。"
+    validations:
+      required: true
+
+  - type: input
+    id: reproduction_steps
+    attributes:
+      label: "再現手順"
+      description: "バグを再現する手順をステップごとに記述してください。"
+      placeholder: "例: 1. ホームページにアクセス 2. ログインボタンをクリック"
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: "期待される動作"
+      description: "本来どのように動作することが期待されていたのかを書いてください。"
+      placeholder: "例: ボタンをクリックすると、ダッシュボードが表示される。"
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual_behavior
+    attributes:
+      label: "実際の動作"
+      description: "実際にどのように動作したかを書いてください。"
+      placeholder: "例: ボタンをクリックするとアプリがクラッシュする。"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: "バグの深刻度"
+      description: "バグの深刻度を選択してください。"
+      options:
+        - "軽微"
+        - "中程度"
+        - "重大"
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: "環境"
+      description: "使用しているOSやブラウザ、バージョン情報を記載してください。"
+      placeholder: "例: Windows 10, Google Chrome 89.0"
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional_information
+    attributes:
+      label: "追加情報"
+      description: "その他の関連情報やスクリーンショットがあれば記載してください。"
+      placeholder: "ここに情報を入力してください。"

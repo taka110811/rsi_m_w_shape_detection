@@ -1,0 +1,58 @@
+name: "トレーディングシグナルフィルタリングリクエスト"
+description: "フィルタリング機能に関するリクエストを提出するためのテンプレートです"
+title: "トレーディングシグナルフィルタリングリクエスト: [タイトルを入力してください]"
+labels: ['フィルタリング', '機能リクエスト']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **フィルタリングしたいスコープ**
+        フィルタリングを適用したいスコープ（例：特定のインディケーター、時間枠、または市場条件）について記述してください。
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: "フィルタリングしたいスコープ"
+      description: "フィルタリングを適用したい対象や条件を記述してください"
+      placeholder: "例：特定のインディケーター、時間枠、または市場条件"
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        **フィルタリングが必要な理由**
+        フィルタリングがなぜ必要なのかを説明してください。どのような問題や非効率性を解決することが期待されますか？
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: "フィルタリングが必要な理由"
+      description: "フィルタリングが必要な理由や期待される効果を記述してください"
+      placeholder: "フィルタリングがなぜ必要かを説明してください"
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        **フィルタリング機能実装手順**
+        下記の実装手順を参考に、実際に必要な手順をチェックしてください。
+
+  - type: checkboxes
+    id: steps
+    attributes:
+      label: "フィルタリング機能実装手順"
+      options:
+        - label: "フィルタリングが必要なトレーディングシグナルを特定する"
+        - label: "フィルタリング基準を定義する（例：RSI > 70、MACDのクロスオーバーなど）"
+        - label: "特定のシグナルにフィルタを適用する"
+        - label: "フィルタリング後の結果をモニタリング・評価する"
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        **スクリーンショットまたはデータ**
+        フィルタリングの適用前後のシグナルや、その効果を説明するスクリーンショットやデータをコメントにアップロードしてください。
