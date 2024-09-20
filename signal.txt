@@ -1,35 +1,69 @@
 //@version=5
-indicator("RSI Contextual Anomaly Detection with RSI Diff Visualization and Alerts", overlay=false)
+indicator("RSI M and W Shape Detection with Custom Movement", overlay=false)
 
-// ユーザーが設定できるパラメータ
+// パラメータの設定
 rsi_length = input.int(14, title="RSI Length")  // RSIの期間
-context_window = input.int(7, title="Context Window")  // 文脈ウィンドウの長さ
-anomaly_threshold = input.float(15.0, title="Anomaly Threshold")  // 異常検知の閾値
 
 // RSIの計算
 rsi = ta.rsi(close, rsi_length)
 
-// 文脈に基づくRSIの変動の計算
-rsi_diff = rsi - ta.sma(rsi, context_window)  // RSIとその過去の平均との変動
-rsi_diff_abs = math.abs(rsi_diff)  // 変動の絶対値
+// 状態を保持するための変数（M字パターン）
+var bool first_move_detected = false
+var bool small_move_detected = false
+var bool is_m_shape = false
 
-// RSIの急激な変動を検知（閾値を超えた場合を異常とする）
-is_anomaly = rsi_diff_abs > anomaly_threshold
+// 状態を保持するための変数（W字パターン）
+var bool first_move_down_detected = false
+var bool small_move_up_detected = false
+var bool is_w_shape = false
 
-// RSIと異常をプロット
+// RSIの変動量を計算（1期間前との比較）
+rsi_change = rsi - rsi[1]
+
+// M字型の検知ロジック
+if not first_move_detected and rsi_change >= 10 and rsi_change <= 20
+    first_move_detected := true  // 最初の10〜20ポイントの上昇を記録
+
+if first_move_detected and not small_move_detected and rsi_change >= -6 and rsi_change <= -1
+    small_move_detected := true  // -5〜0ポイントの小さな下降を記録
+
+if first_move_detected and small_move_detected and rsi_change >= 2 and rsi_change <= 7
+    is_m_shape := true  // 2度目の2〜7ポイントの上昇を記録し、M字型検出
+
+// W字型の検知ロジック
+if not first_move_down_detected and rsi_change <= -10 and rsi_change >= -20
+    first_move_down_detected := true  // 最初の-10〜-20ポイントの下降を記録
+
+if first_move_down_detected and not small_move_up_detected and rsi_change >= 1 and rsi_change <= 6
+    small_move_up_detected := true  // 0〜5ポイントの小さな上昇を記録
+
+if first_move_down_detected and small_move_up_detected and rsi_change <= -2 and rsi_change >= -7
+    is_w_shape := true  // 2度目の-2〜-7ポイントの下降を記録し、W字型検出
+
+// RSIとパターンの検知をプロット
 plot(rsi, title="RSI", color=color.blue)
 hline(70, "Overbought", color=color.red)
 hline(30, "Oversold", color=color.green)
-hline(15, "Oversold", color=color.aqua, linestyle=hline.style_dotted)
 
-// 異常箇所をプロット
-plotshape(series=is_anomaly, location=location.abovebar, color=color.red, style=shape.triangledown, size=size.small, title="Anomaly")
+// M字型が検知された場合にプロット
+plotshape(series=is_m_shape, location=location.abovebar, style=shape.xcross, color=color.red, size=size.small)
 
-// rsi_diff_absを視覚化
-plot(rsi_diff_abs, title="RSI Difference (Absolute)", color=color.purple, linewidth=2)
+// W字型が検知された場合にプロット
+plotshape(series=is_w_shape, location=location.belowbar, style=shape.circle, color=color.green, size=size.small)
 
-// 背景色を異常時に変更
-bgcolor(is_anomaly ? color.new(color.red, 90) : na)
+// パターンを検知した際の背景色
+bgcolor(is_m_shape or is_w_shape ? color.new(color.lime, 90) : na)
 
-// アラート設定（異常検知時にアラートを発生）
-alertcondition(is_anomaly, title="RSI Anomaly Alert", message="RSI Anomaly Detected!")
+// 単一のアラート条件
+alertcondition(is_m_shape or is_w_shape, title="RSI M or W Shape Detected", message="RSIでM字またはW字パターンを検出しました。")
+
+// 状態をリセット
+if is_m_shape
+    first_move_detected := false
+    small_move_detected := false
+    is_m_shape := false
+
+if is_w_shape
+    first_move_down_detected := false
+    small_move_up_detected := false
+    is_w_shape := false
