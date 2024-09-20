@@ -20,30 +20,29 @@ var bool is_w_shape = false
 // RSIの変動量を計算（1期間前との比較）
 rsi_change = rsi - rsi[1]
 
-// パターン検出を実行する条件
-rsi_outside_range = rsi < 40 or rsi > 60
-
 // M字型の検知ロジック
-if rsi_outside_range
-    if not first_move_detected and rsi_change >= 10 and rsi_change <= 20
-        first_move_detected := true  // 最初の10〜20ポイントの上昇を記録
+if not first_move_detected and rsi_change >= 10 and rsi_change <= 20
+    first_move_detected := true  // 最初の10〜20ポイントの上昇を記録
 
-    if first_move_detected and not small_move_detected and rsi_change >= -6 and rsi_change <= -1
-        small_move_detected := true  // -6〜-1ポイントの小さな下降を記録
+if first_move_detected and not small_move_detected and rsi_change >= -6 and rsi_change <= -1
+    small_move_detected := true  // -6〜-1ポイントの小さな下降を記録
 
-    if first_move_detected and small_move_detected and rsi_change >= 2 and rsi_change <= 7
-        is_m_shape := true  // 2度目の2〜7ポイントの上昇を記録し、M字型検出
+if first_move_detected and small_move_detected and rsi_change >= 2 and rsi_change <= 7
+    is_m_shape := true  // 2度目の2〜7ポイントの上昇を記録し、M字型検出
 
 // W字型の検知ロジック
-if rsi_outside_range
-    if not first_move_down_detected and rsi_change <= -10 and rsi_change >= -20
-        first_move_down_detected := true  // 最初の-10〜-20ポイントの下降を記録
+if not first_move_down_detected and rsi_change <= -10 and rsi_change >= -20
+    first_move_down_detected := true  // 最初の-10〜-20ポイントの下降を記録
 
-    if first_move_down_detected and not small_move_up_detected and rsi_change >= 1 and rsi_change <= 6
-        small_move_up_detected := true  // 1〜6ポイントの小さな上昇を記録
+if first_move_down_detected and not small_move_up_detected and rsi_change >= 1 and rsi_change <= 6
+    small_move_up_detected := true  // 1〜6ポイントの小さな上昇を記録
 
-    if first_move_down_detected and small_move_up_detected and rsi_change <= -2 and rsi_change >= -7
-        is_w_shape := true  // 2度目の-2〜-7ポイントの下降を記録し、W字型検出
+if first_move_down_detected and small_move_up_detected and rsi_change <= -2 and rsi_change >= -7
+    is_w_shape := true  // 2度目の-2〜-7ポイントの下降を記録し、W字型検出
+
+// シグナルの条件を設定
+is_m_shape_signal = is_m_shape and rsi >= 60
+is_w_shape_signal = is_w_shape and rsi <= 40
 
 // RSIとパターンの検知をプロット
 plot(rsi, title="RSI", color=color.blue)
@@ -51,16 +50,16 @@ hline(70, "Overbought", color=color.red)
 hline(30, "Oversold", color=color.green)
 
 // M字型が検知された場合にプロット
-plotshape(series=is_m_shape, location=location.abovebar, style=shape.xcross, color=color.red, size=size.small)
+plotshape(series=is_m_shape_signal, location=location.abovebar, style=shape.xcross, color=color.red, size=size.small)
 
 // W字型が検知された場合にプロット
-plotshape(series=is_w_shape, location=location.belowbar, style=shape.circle, color=color.green, size=size.small)
+plotshape(series=is_w_shape_signal, location=location.belowbar, style=shape.circle, color=color.green, size=size.small)
 
 // パターンを検知した際の背景色
-bgcolor((is_m_shape or is_w_shape) ? color.new(color.lime, 90) : na)
+bgcolor((is_m_shape_signal or is_w_shape_signal) ? color.new(color.lime, 90) : na)
 
 // 単一のアラート条件
-alertcondition(is_m_shape or is_w_shape, title="RSI M or W Shape Detected", message="RSIでM字またはW字パターンを検出しました。")
+alertcondition(is_m_shape_signal or is_w_shape_signal, title="RSI M or W Shape Detected", message="RSIでM字またはW字パターンを検出しました。")
 
 // 状態をリセット
 if is_m_shape
